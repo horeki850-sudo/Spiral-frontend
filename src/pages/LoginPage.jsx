@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Box,
@@ -27,16 +26,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await login(email, password);
-
-      if (response.user.role === "admin") {
-        navigate("/");
-      } else {
-        navigate("/");
-      }
+      await login(email.trim().toLowerCase(), password);
+      navigate("/");
     } catch (err) {
       setError(
-        err.response?.data?.message || "Login failed. Check your email and password."
+        err.response?.data?.message ||
+          "Login failed. Please check your email and password."
       );
     } finally {
       setLoading(false);
@@ -44,17 +39,44 @@ export default function LoginPage() {
   };
 
   return (
-    <Box sx={{ maxWidth: 450, mx: "auto", mt: 6, p: 2 }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-        <Typography variant="h4" fontWeight={700} textAlign="center" mb={1}>
+    <Box
+      sx={{
+        maxWidth: 450,
+        mx: "auto",
+        mt: { xs: 4, sm: 8 },
+        mb: 4,
+        px: 2,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 3, sm: 4 },
+          borderRadius: 3,
+        }}
+      >
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          textAlign="center"
+          gutterBottom
+        >
           Welcome Back
         </Typography>
 
-        <Typography color="text.secondary" textAlign="center" mb={3}>
+        <Typography
+          color="text.secondary"
+          textAlign="center"
+          sx={{ mb: 3 }}
+        >
           Login to your Spiral Store account
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
@@ -63,8 +85,10 @@ export default function LoginPage() {
             fullWidth
             required
             margin="normal"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
           />
 
           <TextField
@@ -73,8 +97,10 @@ export default function LoginPage() {
             fullWidth
             required
             margin="normal"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
           />
 
           <Button
@@ -83,13 +109,22 @@ export default function LoginPage() {
             fullWidth
             size="large"
             disabled={loading}
-            sx={{ mt: 3 }}
+            sx={{
+              mt: 3,
+              py: 1.3,
+              fontWeight: 600,
+              borderRadius: 2,
+            }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Login"
+            )}
           </Button>
         </Box>
 
-        <Typography textAlign="center" mt={3}>
+        <Typography textAlign="center" sx={{ mt: 3 }}>
           Don't have an account?{" "}
           <Link to="/register">Register here</Link>
         </Typography>
