@@ -22,6 +22,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ProductCard from "../components/ProductCard";
 import ProductFormDialog from "../components/ProductFormDialog";
 import DeleteProductDialog from "../components/DeleteProductDialog";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProductListPage({
   products = [],
@@ -32,6 +33,8 @@ export default function ProductListPage({
   onUpdate,
   onRemove,
 }) {
+  const { isAdmin } = useAuth();
+
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletingProduct, setDeletingProduct] = useState(null);
@@ -41,17 +44,13 @@ export default function ProductListPage({
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [sortOption, setSortOption] = useState("default");
 
-  // GET CATEGORY NAMES
   const categoryNames = [
     "All",
     ...new Set(
-      products.map(
-        (product) => product.category || "Uncategorized"
-      )
+      products.map((product) => product.category || "Uncategorized")
     ),
   ];
 
-  // SEARCH AND FILTER PRODUCTS
   const filteredProducts = products.filter((product) => {
     const searchText = search.toLowerCase().trim();
     const productName = (product.name || "").toLowerCase();
@@ -70,40 +69,35 @@ export default function ProductListPage({
     return matchesSearch && matchesCategory;
   });
 
-  // SORT PRODUCTS
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortOption) {
       case "name-asc":
         return a.name.localeCompare(b.name);
-
       case "name-desc":
         return b.name.localeCompare(a.name);
-
       case "price-asc":
         return Number(a.price) - Number(b.price);
-
       case "price-desc":
         return Number(b.price) - Number(a.price);
-
       default:
         return 0;
     }
   });
 
-  // OPEN ADD PRODUCT FORM
   const openAdd = () => {
     setEditingProduct(null);
     setFormOpen(true);
   };
 
-  // OPEN EDIT PRODUCT FORM
   const openEdit = (product) => {
+    if (!isAdmin) return;
     setEditingProduct(product);
     setFormOpen(true);
   };
 
-  // CREATE OR UPDATE PRODUCT
   const handleSave = async (values) => {
+    if (!isAdmin) return;
+
     try {
       if (editingProduct) {
         await onUpdate(editingProduct.id, values);
@@ -117,7 +111,6 @@ export default function ProductListPage({
       setEditingProduct(null);
     } catch (error) {
       console.error("Product save failed:", error);
-
       setNotice(
         error.response?.data?.message ||
           "Failed to save product. Please try again."
@@ -125,18 +118,15 @@ export default function ProductListPage({
     }
   };
 
-  // DELETE PRODUCT
   const handleDelete = async () => {
-    if (!deletingProduct) return;
+    if (!isAdmin || !deletingProduct) return;
 
     try {
       await onRemove(deletingProduct.id);
-
       setDeletingProduct(null);
       setNotice("Product deleted successfully.");
     } catch (error) {
       console.error("Product deletion failed:", error);
-
       setNotice(
         error.response?.data?.message ||
           "Failed to delete product. Please try again."
@@ -146,7 +136,6 @@ export default function ProductListPage({
 
   return (
     <main className="page-container">
-      {/* PAGE HEADER */}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         alignItems={{ xs: "stretch", sm: "center" }}
@@ -164,16 +153,17 @@ export default function ProductListPage({
           </Typography>
         </div>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={openAdd}
-        >
-          Add Product
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={openAdd}
+          >
+            Add Product
+          </Button>
+        )}
       </Stack>
 
-      {/* SEARCH */}
       <TextField
         fullWidth
         placeholder="Search products by name or category..."
@@ -191,19 +181,14 @@ export default function ProductListPage({
         }}
       />
 
-      {/* CATEGORY FILTER */}
       <FormControl fullWidth sx={{ mb: 3, bgcolor: "white" }}>
-        <InputLabel id="category-filter-label">
-          Category
-        </InputLabel>
+        <InputLabel id="category-filter-label">Category</InputLabel>
 
         <Select
           labelId="category-filter-label"
           value={categoryFilter}
           label="Category"
-          onChange={(event) =>
-            setCategoryFilter(event.target.value)
-          }
+          onChange={(event) => setCategoryFilter(event.target.value)}
         >
           {categoryNames.map((category) => (
             <MenuItem key={category} value={category}>
@@ -213,19 +198,14 @@ export default function ProductListPage({
         </Select>
       </FormControl>
 
-      {/* SORT PRODUCTS */}
       <FormControl fullWidth sx={{ mb: 3, bgcolor: "white" }}>
-        <InputLabel id="sort-products-label">
-          Sort Products
-        </InputLabel>
+        <InputLabel id="sort-products-label">Sort Products</InputLabel>
 
         <Select
           labelId="sort-products-label"
           value={sortOption}
           label="Sort Products"
-          onChange={(event) =>
-            setSortOption(event.target.value)
-          }
+          onChange={(event) => setSortOption(event.target.value)}
         >
           <MenuItem value="default">Default Order</MenuItem>
           <MenuItem value="name-asc">Name: A–Z</MenuItem>
@@ -235,23 +215,15 @@ export default function ProductListPage({
         </Select>
       </FormControl>
 
-      {/* PRODUCT DISPLAY STATES */}
       {loading ? (
-        <Stack
-          alignItems="center"
-          spacing={2}
-          sx={{ py: 6 }}
-        >
+        <Stack alignItems="center" spacing={2} sx={{ py: 6 }}>
           <CircularProgress />
-
           <Typography color="text.secondary">
             Loading products...
           </Typography>
         </Stack>
       ) : loadError ? (
-        <Alert severity="error">
-          {loadError}
-        </Alert>
+        <Alert severity="error">{loadError}</Alert>
       ) : products.length === 0 ? (
         <Alert severity="info">
           There are no products yet. Add your first product.
@@ -266,33 +238,34 @@ export default function ProductListPage({
             <ProductCard
               key={product.id}
               product={product}
-              onEdit={openEdit}
-              onDelete={setDeletingProduct}
+              onEdit={isAdmin ? openEdit : undefined}
+              onDelete={isAdmin ? setDeletingProduct : undefined}
             />
           ))}
         </div>
       )}
 
-      {/* ADD AND EDIT PRODUCT DIALOG */}
-      <ProductFormDialog
-        open={formOpen}
-        product={editingProduct}
-        categories={availableCategories}
-        onClose={() => {
-          setFormOpen(false);
-          setEditingProduct(null);
-        }}
-        onSave={handleSave}
-      />
+      {isAdmin && (
+        <>
+          <ProductFormDialog
+            open={formOpen}
+            product={editingProduct}
+            categories={availableCategories}
+            onClose={() => {
+              setFormOpen(false);
+              setEditingProduct(null);
+            }}
+            onSave={handleSave}
+          />
 
-      {/* DELETE CONFIRMATION DIALOG */}
-      <DeleteProductDialog
-        product={deletingProduct}
-        onClose={() => setDeletingProduct(null)}
-        onConfirm={handleDelete}
-      />
+          <DeleteProductDialog
+            product={deletingProduct}
+            onClose={() => setDeletingProduct(null)}
+            onConfirm={handleDelete}
+          />
+        </>
+      )}
 
-      {/* SUCCESS AND ERROR NOTIFICATIONS */}
       <Snackbar
         open={Boolean(notice)}
         autoHideDuration={3000}

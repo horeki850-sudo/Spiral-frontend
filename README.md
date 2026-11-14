@@ -1,143 +1,112 @@
-# Activity #7: ReactJS Events, State & API Integration
+# Spiral Store – Frontend
 
-## Product Management with Axios and a REST API
+## Project Description
 
-### Project Description
+Spiral Store is an e-commerce product management application developed using React and Material UI. This frontend connects to a Laravel REST API and provides user authentication, role-based access control, and product management features.
 
-This project is a Product Management application built using ReactJS, Material UI (MUI), Axios, and a Laravel REST API.
+## Technologies Used
 
-It allows users to view, create, update, and delete products. Product information is stored in the Laravel backend and MySQL database instead of being stored only in React state.
-
-### Technologies Used
-
-- ReactJS
+- React
 - Vite
 - Material UI (MUI)
-- Axios
 - React Router DOM
-- Laravel REST API
-- MySQL
+- Axios
 - JavaScript
-- CSS
+- Laravel REST API
+- Laravel Sanctum
 
-### Project Setup
+## Features
 
-#### 1. Install Dependencies
+### Authentication
+- User registration
+- User login
+- User logout
+- Token-based authentication using Laravel Sanctum
+- Automatic token attachment to API requests
+- Automatic logout when an unauthorized response (401) is received
 
-Open a terminal inside the frontend project folder and run:
+### Authorization
+- Admin and normal user roles
+- Protected routes for authenticated users
+- Admin-only product management controls
+- Normal users can view products but cannot create, update, or delete them
+
+### Product Management
+- View product catalog
+- View product details
+- Add products (Admin)
+- Edit products (Admin)
+- Delete products (Admin)
+- Search products
+- Filter products by category
+- Sort products by name and price
+
+## Installation and Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/horeki850-sudo/Spiral-frontend.git
+```
+
+### 2. Open the Project Folder
+
+```bash
+cd Spiral-frontend
+```
+
+### 3. Install Dependencies
 
 ```bash
 npm install
 ```
 
-#### 2. Configure the API URL
+### 4. Configure the API URL
 
-Create or update the `.env` file in the frontend project root:
+Create a `.env` file in the project root and add:
 
 ```env
 VITE_API_BASE_URL=http://127.0.0.1:8000/api
 ```
 
-#### 3. Start the Laravel Backend
-
-Open a terminal inside the Laravel project folder:
+### 5. Start the Development Server
 
 ```bash
-cd C:\laragon\www\ecommerce-api
-php artisan serve
-```
-
-The Laravel API should be available at:
-
-`http://127.0.0.1:8000`
-
-#### 4. Start the React Frontend
-
-Open another terminal inside the frontend folder:
-
-```bash
-cd C:\laragon\e-commerce-fe
 npm run dev
 ```
 
-Open the Vite URL shown in the terminal, normally:
+Open the local URL displayed in the terminal, usually:
 
 `http://localhost:5173`
 
-Both the Laravel backend and React frontend must be running.
+## Backend Connection
 
-### API Endpoints
+The frontend requires the Laravel backend to be running.
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | /api/products | Retrieve all products |
-| GET | /api/products/{id} | Retrieve one product |
-| POST | /api/products | Create a product |
-| PUT | /api/products/{id} | Update a product |
-| DELETE | /api/products/{id} | Delete a product |
-| GET | /api/categories | Retrieve product categories |
+Default API address:
 
-### Main Features
+`http://127.0.0.1:8000/api`
 
-1. Display all products from the Laravel API.
-2. View individual product details.
-3. Add new products.
-4. Edit existing products.
-5. Delete products with confirmation.
-6. Search and filter products.
-7. Validate product information.
-8. Display loading indicators.
-9. Display API error messages.
-10. Display an empty-state message when no products exist.
-11. Responsive layout for desktop, tablet, and mobile screens.
+Backend repository:
 
-### React Concepts Demonstrated
+https://github.com/horeki850-sudo/Spiral-backend
 
-**Events:** Event handlers respond to user actions, such as clicking buttons, submitting forms, and changing input values.
+## User Roles
 
-**State:** React `useState` manages product information, loading status, form visibility, and error messages.
+| Role | Permissions |
+|---|---|
+| Admin | View, add, edit, and delete products |
+| Normal User | View products and product details |
+| Guest | Must log in before accessing the product catalog |
 
-**Effects:** React `useEffect` loads product and category information when components are opened or when the product ID changes.
+The backend also enforces authorization, so hiding management buttons in the frontend is not the only security measure.
 
-**Axios:** Axios sends HTTP requests between the React frontend and Laravel backend.
+## Project Repository
 
-**Routing:** React Router DOM handles navigation between the product catalog and individual product details.
+Frontend GitHub Repository:
 
-### API Integration
+https://github.com/horeki850-sudo/Spiral-frontend
 
-Axios is configured in a reusable instance located at:
+## Developers
 
-`src/api/axios.js`
-
-The frontend communicates with Laravel through the configured API base URL.
-
-The Laravel backend is responsible for storing and retrieving product information. Changes remain saved after refreshing the browser.
-
-### Backend and Frontend Differences
-
-- The backend uses `category_id` to identify product categories.
-- Product codes must be unique.
-- Price and stock must contain valid values.
-- Product information is returned through Laravel API resources.
-- The backend does not currently provide product image uploads, so the frontend uses a placeholder image.
-
-### Screenshots
-
-Place your Activity #7 screenshots in a folder named `screenshots`.
-
-Include screenshots of:
-
-- Product catalog
-- Product details
-- Adding a product
-- Editing a product
-- Deleting a product
-- Duplicate product validation
-- Empty product state
-- API error state
-- Restored API connection
-- Responsive desktop, tablet, and mobile layouts
-
-### Conclusion
-
-This activity demonstrates how ReactJS can communicate with a Laravel REST API using Axios. It applies React events, state management, effects, routing, validation, and CRUD operations to create a functional Product Management application.
+Developed as part of the Activity 8 requirements for authentication, authorization, and GitHub collaboration.

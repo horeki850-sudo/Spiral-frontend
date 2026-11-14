@@ -1,3 +1,4 @@
+
 import {
   Button,
   Card,
@@ -7,6 +8,7 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
+
 import { Link as RouterLink } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
@@ -56,7 +58,6 @@ export default function ProductCard({ product, onEdit, onDelete }) {
         </Typography>
       </CardContent>
 
-      
       <CardActions sx={{ px: 2, pb: 2, flexWrap: "wrap", gap: 1 }}>
         <Button
           size="small"
@@ -68,26 +69,29 @@ export default function ProductCard({ product, onEdit, onDelete }) {
           Details
         </Button>
 
-        <Button
-          size="small"
-          variant="contained"
-          startIcon={<EditIcon />}
-          onClick={() => onEdit(product)}
-        >
-          Edit
-        </Button>
+        {onEdit && (
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={() => onEdit(product)}
+          >
+            Edit
+          </Button>
+        )}
 
-        <Button
-          size="small"
-          variant="outlined"
-          color="error"
-          startIcon={<DeleteIcon />}
-          onClick={() => onDelete(product)}
-        >
-          Delete
-        </Button>
+        {onDelete && (
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => onDelete(product)}
+          >
+            Delete
+          </Button>
+        )}
       </CardActions>
-
     </Card>
   );
 }

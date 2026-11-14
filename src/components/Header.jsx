@@ -13,6 +13,7 @@ import {
   ListItemText,
   Box,
   Divider,
+  Button,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -22,12 +23,24 @@ import CategoryIcon from "@mui/icons-material/Category";
 import InfoIcon from "@mui/icons-material/Info";
 
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+
   const closeMenu = () => setMenuOpen(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const menuItems = [
     { text: "Home", icon: <HomeIcon />, path: "/" },
@@ -64,26 +77,37 @@ export default function Header() {
             Spiral Store
           </Typography>
 
-          <Typography
-            component={Link}
-            to="/"
-            sx={{ color: "inherit", textDecoration: "none" }}
-          >
-            Products
-          </Typography>
+          {isAuthenticated ? (
+            <>
+              <Typography variant="body2" sx={{ mr: 2 }}>
+                {user?.name} {isAdmin ? "(Admin)" : ""}
+              </Typography>
+
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button color="inherit" onClick={() => navigate("/login")}>
+                Login
+              </Button>
+
+              <Button color="inherit" onClick={() => navigate("/register")}>
+                Register
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
 
-      <Drawer
-        anchor="left"
-        open={menuOpen}
-        onClose={closeMenu}
-      >
+      <Drawer anchor="left" open={menuOpen} onClose={closeMenu}>
         <Box sx={{ width: 260 }} role="presentation">
           <Box sx={{ p: 2 }}>
             <Typography variant="h6" fontWeight={700}>
               Spiral Store
             </Typography>
+
             <Typography variant="body2" color="text.secondary">
               Store Navigation
             </Typography>
